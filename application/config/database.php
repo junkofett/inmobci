@@ -49,9 +49,9 @@ $active_group = 'default';
 $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'twitter';
-$db['default']['password'] = 'twitter';
-$db['default']['database'] = 'twitter';
+$db['default']['username'] = 'examen';
+$db['default']['password'] = 'examen';
+$db['default']['database'] = 'examen';
 $db['default']['dbdriver'] = 'postgre';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;
