@@ -2,65 +2,76 @@
 
 class Tabla extends CI_Controller
 {
-	private $where = "where ";
-
-  public function index(){
-  	$tmpl = array('table_open' => '<table border="1" style="margin:auto">');
-
-  	$where = ($this->input->post('filtrar')) ? crear_where() : "";
-
-    $data['res'] = $this->Inmueble->carga_inmuebles();
-
-		$this->table->set_template($tmpl);
-
-    $this->load->view('index', $data);
+  private function comprobar_where($where){
+	  if($where != "where ")
+	    return "and ";
   }
 
-  private function crear_where(){
-  	$lavavajillas = $this->load->post('lavavajillas');
-  	$trastero = $this->load->post('trastero');
-  	$garaje = $this->load->post('garaje');
-  	$premin = $this->load->post('premin');
-  	$premax = $this->load->post('premax');
-  	$hab = $this->load->post('hab');
-  	$ban = $this->load->post('ban');
-
-  	$where .= ($lavavajillas !== FALSE) ? comprobar_where()."lavavajillas is true " : "";
-    $where .= ($garaje !== FALSE) ? comprobar_where()."garaje is true " : "";
-    $where .= ($trastero !== FALSE) ? comprobar_where()."trastero is true " : "";
-
-    if((isset($premin) && $premin != "") && (isset($premax) && $premax != "")){
-      $where .= comprobar_where()."precio between $premin and $premax ";
-    }
-
-    if((isset($premin) && $premin != "") && (isset($premax) && $premax == "")){
-      $where .= comprobar_where()."precio >= $premin ";
-    }
-
-    if((isset($premin) && $premin == "") && (isset($premax) && $premax != "")){
-      $where .= comprobar_where()."precio <= $premax ";
-    }
-
-    if((isset($hab) && $hab != "")){
-      $where .= comprobar_where()."habitaciones >= $hab";
-    }
-
-    if((isset($ban) && $ban != "")){
-      $where .= comprobar_where()."baños >= $ban";
-    }
+  private function comprobar_filtro($filtro){
+  	return ($filtro !== FALSE) ? TRUE : FALSE; 
   }
 
-  private function comprobar_where(){
-    if($where != "where ")
-      $where .= "and ";
-  }
+ 	private function crear_where(){
+ 		$where = "where ";
+		$lavavajillas = $this->input->post('lavavajillas');
+		$trastero = $this->input->post('trastero');
+		$garaje = $this->input->post('garaje');
+		$premin = $this->input->post('premin');
+		$premax = $this->input->post('premax');
+		$hab = $this->input->post('hab');
+		$ban = $this->input->post('ban');
 
-  /*Lavavajillas <input type="checkbox" name="lavavajillas" <?=(isset($lavavajillas) && $lavavajillas == "on") ? "checked" : "" ?> > <br>
-      Garaje <input type="checkbox" name="garaje" <?=(isset($garaje) && $garaje == "on") ? "checked" : "" ?> > <br>
-      Trastero <input type="checkbox" name="trastero" <?=(isset($trastero) && $trastero == "on") ? "checked" : "" ?> > <br>
-      Precio Mínimo <input type="text" name="premin" value=<?=(isset($premin) && $premin != "") ? "$premin" : "" ?> > <br>
-      Precio Máximo <input type="text" name="premax" value=<?=(isset($premax) && $premax != "") ? "$premax" : ""  ?> > <br>
-      Número minimo de habitaciones <input type="text" name="hab" value=<?=(isset($hab) && $hab != "") ? "$hab" : ""  ?> > <br>
-      Número mínimo de baños  <input type="text" name="ban" value=<?=(isset($ban) && $ban != "") ? "$ban" : ""  ?> > <br>
-      <br>*/
+		if($this->comprobar_filtro($lavavajillas)){
+			$where .= $this->comprobar_where($where);
+			$where .= "lavavajillas is true ";
+		}
+
+		if($this->comprobar_filtro($trastero)){
+			$where  .= $this->comprobar_where($where);
+			$where .= "trastero is true ";	
+		}
+
+		if($this->comprobar_filtro($garaje)){
+			$where .= $this->comprobar_where($where);
+			$where .= "garaje is true ";	
+		}
+
+	  if(($premin != "") && ($premax != "")){
+			$where .= $this->comprobar_where($where);
+	    $where .= "precio between $premin and $premax ";
+	  }
+
+	  if(($premin != "") && (($premax == ""))){
+			$where .= $this->comprobar_where($where);
+	    $where .= "precio >= $premin ";
+	  }
+
+	  if(($premin == "") && ($premax != "")){
+			$where .= $this->comprobar_where($where);
+	    $where .= "precio <= $premax ";
+	  }
+
+	  if($hab != ""){
+			$where .= $this->comprobar_where($where);
+	    $where .= "habitaciones >= $hab";
+	  }
+
+	  if($ban != ""){
+			$where .= $this->comprobar_where($where);
+	    $where .= "baños >= $ban";
+	  }
+
+	  return ($where != "where ") ? $where : "";
+	}
+
+	public function index(){
+		$where = ($this->input->post('filtrar')) ? $this->crear_where() : "";
+
+	  $data['res'] = $this->Inmueble->carga_inmuebles($where);
+	  
+	  if($this->input->post('telefono'))
+	  	$data['telefono'] = $this->input->post('telefono');
+
+	  $this->load->view('index', $data);
+	}
 }

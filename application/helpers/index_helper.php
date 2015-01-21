@@ -43,6 +43,29 @@ function comprobar_check($nombre){
 }
 
 function tabla_inm($res){
-  $CI =& get_instance();
-  return $CI->table->generate($res);
+  $out  = "<table border='1' style='margin:auto'>";
+  $out .=    "<thead>";
+  $out .=      "<th>Propietario</th><th>Habitaciones</th><th>Baños</th><th>Lavavajillas</th><th>Garaje</th><th>Trastero</th><th>Precio</th><th>Interes</th>";
+  $out .=    "</thead>";
+  $out .=    "<tbody>";
+
+  if($res != NULL){
+    foreach($res as $fila){
+      $out .= "<tr>";
+      $out .=     "<td>".$fila['nombre']."</td>";
+      $out .=     "<td>".$fila['habitaciones']."</td>";
+      $out .=     "<td>".$fila['baños']."</td>";
+      $out .=     "<td>".$fila['lavavajillas']."</td>";
+      $out .=     "<td>".$fila['garaje']."</td>";
+      $out .=     "<td>".$fila['trastero']."</td>";
+      $out .=     "<td>".$fila['precio']."</td>";
+      $out .=     "<td>".$fila['interes']."</td>";
+      $out .= "</tr>";
+    }
+  }
+
+  $out .=    "</tbody>";
+  $out .= "</table>";
+
+  return $out;
 }
